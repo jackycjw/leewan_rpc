@@ -1,5 +1,6 @@
 package com.leewan.server;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
