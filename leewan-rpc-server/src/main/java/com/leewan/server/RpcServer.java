@@ -2,17 +2,18 @@ package com.leewan.server;
 
 
 import com.leewan.server.except.BindServiceException;
+import com.leewan.server.handler.Test2Handler;
 import com.leewan.server.handler.TestHandler;
-import com.leewan.util.Assert;
-import com.leewan.util.ReflectUtils;
+import com.leewan.share.handler.codec.KryoRequestMessageDecoder;
+import com.leewan.share.message.RequestMessage;
+import com.leewan.share.util.Assert;
+import com.leewan.share.util.ReflectUtils;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.compression.JdkZlibDecoder;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -79,10 +80,14 @@ public class RpcServer {
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
+                            pipeline.addLast(new LengthFieldBasedFrameDecoder(
+                                    configuration.getMaxMessageSize(), 0, 4, 0,4));
+                            pipeline.addLast(new JdkZlibDecoder());
+                            pipeline.addLast(new KryoRequestMessageDecoder());
                             pipeline.addLast(new TestHandler());
                         }
                     })
-                    .bind(this.configuration.getAddress(), this.configuration.getPort()).sync();
+                    .bind(this.configuration.getBindAddress(), this.configuration.getPort()).sync();
 
             channelFuture.channel().closeFuture().sync();
         } finally {
