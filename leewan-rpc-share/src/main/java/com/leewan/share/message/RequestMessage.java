@@ -15,7 +15,7 @@ public class RequestMessage extends Message {
     /**
      * 方法元数据
      */
-    private MethodMeta methodMeta;
+    private InvokeMeta invokeMeta;
     /**
      * 消息头信息
      */

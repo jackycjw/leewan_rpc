@@ -29,6 +29,6 @@
     </root>
 
     <!--<logger name="org.springframework" level="info" />-->
-    <logger name="com.leewan" level="info" />
+    <logger name="com.leewan" level="debug" />
 
 </configuration>

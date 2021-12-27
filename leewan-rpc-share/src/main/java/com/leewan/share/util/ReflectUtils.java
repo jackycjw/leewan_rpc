@@ -2,6 +2,8 @@ package com.leewan.share.util;
 
 
 
+import lombok.SneakyThrows;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,4 +37,27 @@ public class ReflectUtils {
         return true;
     }
 
+    @SneakyThrows
+    public static Class getClassByName(String name){
+        switch (name){
+            case "int":
+                return int.class;
+            case "short":
+                return short.class;
+            case "long":
+                return long.class;
+            case "byte":
+                return byte.class;
+            case "boolean":
+                return boolean.class;
+            case "char":
+                return char.class;
+            case "float":
+                return float.class;
+            case "double":
+                return double.class;
+            default:
+                return Class.forName(name);
+        }
+    }
 }

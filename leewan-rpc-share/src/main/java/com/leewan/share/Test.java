@@ -5,7 +5,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leewan.share.message.MethodMeta;
+import com.leewan.share.message.InvokeMeta;
 import com.leewan.share.message.RequestMessage;
 import io.netty.handler.codec.compression.GzipOptions;
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -47,7 +47,7 @@ public class Test {
     }
     public static RequestMessage getRequestMessage(){
         RequestMessage requestMessage = new RequestMessage();
-        requestMessage.setMethodMeta(getMethodMeta());
+        requestMessage.setInvokeMeta(getInvokeMeta());
         HashMap<Object, Object> map1 = new HashMap<>();
         map1.put("k1","v1");
 
@@ -64,8 +64,8 @@ public class Test {
         return requestMessage;
     }
 
-    public static MethodMeta getMethodMeta(){
-        MethodMeta meta = new MethodMeta();
+    public static InvokeMeta getInvokeMeta(){
+        InvokeMeta meta = new InvokeMeta();
 //        meta.setMethod(10);
         meta.setMethodName("hhhh");
         meta.setParameterTypeNames(Arrays.asList("aa","bb"));

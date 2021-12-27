@@ -4,6 +4,6 @@ import com.leewan.share.configuration.Configuration;
 import lombok.Data;
 
 @Data
-public class RpcClientConfiguration extends Configuration {
+public class ClientConfiguration extends Configuration {
     private String remoteAddress = "localhost";
 }

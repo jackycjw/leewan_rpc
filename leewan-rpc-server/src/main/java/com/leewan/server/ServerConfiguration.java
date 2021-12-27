@@ -9,6 +9,6 @@ import lombok.Data;
  * @Date 2021/12/17 12:59
  */
 @Data
-public class RpcServerConfiguration extends Configuration {
+public class ServerConfiguration extends Configuration {
     private String bindAddress = "0.0.0.0";
 }
