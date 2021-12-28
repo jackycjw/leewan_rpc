@@ -14,6 +14,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.compression.JdkZlibDecoder;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
  * @author chenjw
  * @Date 2021/12/17 12:56
  */
+@Slf4j
 public class RpcServer {
 
     private ServerConfiguration configuration;
@@ -51,36 +54,36 @@ public class RpcServer {
     }
 
 
-    public void start() throws InterruptedException {
-        NioEventLoopGroup boss = new NioEventLoopGroup();
-        NioEventLoopGroup worker = new NioEventLoopGroup();
+    private Channel channel;
+    private NioEventLoopGroup boss;
+    private NioEventLoopGroup worker;
+
+    @SneakyThrows
+    public void start()  {
+        boss = new NioEventLoopGroup();
+        worker = new NioEventLoopGroup();
+
         DefaultEventLoopGroup serviceGroup = new DefaultEventLoopGroup();
 
-        try {
-            ChannelFuture channelFuture = new ServerBootstrap()
-                    .group(boss, worker)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<>() {
-                        @Override
-                        protected void initChannel(Channel ch) throws Exception {
-                            ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast(new LengthFieldBasedFrameDecoder(
-                                    configuration.getMaxMessageSize(), 0, 4, 0,4));
-                            pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
-                            pipeline.addLast(new JdkZlibDecoder());
-                            pipeline.addLast(new KryoRequestMessageDecoder());
-                            pipeline.addLast(new KryoResponseMessageEncoder());
-                            pipeline.addLast(serviceGroup, new ServiceHandler(serviceContainer));
-                        }
-                    })
-                    .bind(this.configuration.getBindAddress(), this.configuration.getPort()).sync();
+        ChannelFuture channelFuture = new ServerBootstrap()
+                .group(boss, worker)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<>() {
+                    @Override
+                    protected void initChannel(Channel ch) throws Exception {
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new LengthFieldBasedFrameDecoder(
+                                configuration.getMaxMessageSize(), 0, 4, 0,4));
+                        pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
+                        pipeline.addLast(new JdkZlibDecoder());
+                        pipeline.addLast(new KryoRequestMessageDecoder());
+                        pipeline.addLast(new KryoResponseMessageEncoder());
+                        pipeline.addLast(serviceGroup, new ServiceHandler(serviceContainer));
+                    }
+                })
+                .bind(this.configuration.getBindAddress(), this.configuration.getPort()).sync();
 
-            channelFuture.channel().closeFuture().sync();
-        } finally {
-            boss.shutdownGracefully();
-            worker.shutdownGracefully();
-        }
-
+        channel = channelFuture.channel();
     }
 
 }
