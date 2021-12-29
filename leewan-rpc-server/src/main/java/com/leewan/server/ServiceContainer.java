@@ -43,6 +43,7 @@ public class ServiceContainer {
     public void bind(Object service, List<Class<?>> interfaces){
         Assert.notNull(service, "绑定的服务不能为空");
         interfaces.stream().forEach(inter -> {
+            Assert.isAssignable(inter, service.getClass());
             if (services.containsKey(inter)) {
                 Object bindedService = services.get(inter);
                 if (bindedService.getClass().equals(service.getClass())) {
