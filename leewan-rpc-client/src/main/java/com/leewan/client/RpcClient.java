@@ -13,9 +13,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.compression.JdkZlibEncoder;
-import io.netty.handler.logging.LoggingHandler;
-import io.netty.util.concurrent.DefaultPromise;
-import io.netty.util.concurrent.Promise;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
