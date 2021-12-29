@@ -24,12 +24,6 @@
 
         <dependency>
             <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.70.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
             <version>4.1.70.Final</version>
             <scope>compile</scope>
@@ -45,6 +39,7 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.5</version>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
