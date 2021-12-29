@@ -2,9 +2,13 @@ package com.leewan.server.handler;
 
 import com.leewan.ref.Invoke;
 import com.leewan.server.ServiceContainer;
+import com.leewan.server.filter.DefaultFilterChain;
+import com.leewan.server.filter.Filter;
+import com.leewan.server.filter.FilterChain;
 import com.leewan.share.message.InvokeMeta;
 import com.leewan.share.message.RequestMessage;
 import com.leewan.share.message.ResponseMessage;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -13,29 +17,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> {
+@ChannelHandler.Sharable
+public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> implements Filter {
 
     private ServiceContainer serviceContainer;
 
-    public ServiceHandler(ServiceContainer serviceContainer) {
+    private FilterChain filterChain;
+
+    public ServiceHandler(ServiceContainer serviceContainer, List<Filter> filters) {
         super();
         this.serviceContainer = serviceContainer;
+        DefaultFilterChain filterChain = new DefaultFilterChain();
+        filters.stream().forEach(filterChain::addFilter);
+        filterChain.addFilter(this);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage msg) throws Exception {
         ResponseMessage response = new ResponseMessage();
+        this.filterChain.doFilter(msg, response);
         response.setSequence(msg.getSequence());
-        InvokeMeta meta = msg.getInvokeMeta();
-        try {
-            Invoke invoke = serviceContainer.getInvoke(meta);
-            Object result = invoke.invoke(formatParameters(msg.getParameters()));
-            response.setResponse(result);
-            response.setInvokeId(meta.getInvokeId());
-        }catch (Exception e) {
-            log.error(e.getMessage(), e);
-            response.setExceptionMessage(e.getMessage());
-        }
         ctx.writeAndFlush(response);
     }
 
@@ -45,5 +46,19 @@ public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> 
             objects[i] = parameters.get(i);
         }
         return objects;
+    }
+
+    @Override
+    public void doFilter(RequestMessage request, ResponseMessage response, FilterChain chain) {
+        InvokeMeta meta = request.getInvokeMeta();
+        try {
+            Invoke invoke = serviceContainer.getInvoke(meta);
+            Object result = invoke.invoke(formatParameters(request.getParameters()));
+            response.setResponse(result);
+            response.setInvokeId(meta.getInvokeId());
+        }catch (Exception e) {
+            log.error(e.getMessage(), e);
+            response.setExceptionMessage(e.getMessage());
+        }
     }
 }

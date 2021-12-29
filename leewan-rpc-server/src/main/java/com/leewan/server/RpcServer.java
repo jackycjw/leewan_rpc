@@ -2,6 +2,7 @@ package com.leewan.server;
 
 
 import com.leewan.server.except.BindServiceException;
+import com.leewan.server.filter.Filter;
 import com.leewan.server.handler.ServiceHandler;
 import com.leewan.share.handler.LengthBasedOutboundHandler;
 import com.leewan.share.handler.codec.KryoRequestMessageDecoder;
@@ -17,10 +18,7 @@ import io.netty.handler.codec.compression.JdkZlibDecoder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +51,12 @@ public class RpcServer {
         this.serviceContainer.bind(service, interfaces);
     }
 
+    private List<Filter> filters = new ArrayList<>();
+
+    public void addFilter(Filter filter){
+        filters.add(filter);
+    }
+
 
     private Channel channel;
     private NioEventLoopGroup boss;
@@ -78,7 +82,7 @@ public class RpcServer {
                         pipeline.addLast(new JdkZlibDecoder());
                         pipeline.addLast(new KryoRequestMessageDecoder());
                         pipeline.addLast(new KryoResponseMessageEncoder());
-                        pipeline.addLast(serviceGroup, new ServiceHandler(serviceContainer));
+                        pipeline.addLast(serviceGroup, new ServiceHandler(serviceContainer, filters));
                     }
                 })
                 .bind(this.configuration.getBindAddress(), this.configuration.getPort()).sync();
