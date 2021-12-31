@@ -34,7 +34,7 @@ public class ReflectUtils {
     }
 
     public static boolean isEffectiveInterface(Class<?> clazz){
-        return true;
+        return clazz.getMethods().length > 0;
     }
 
     @SneakyThrows
