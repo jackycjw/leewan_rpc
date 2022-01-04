@@ -23,7 +23,11 @@ public class ProxyServiceInvocation implements InvocationHandler {
 
     private List<Interceptor> interceptors;
 
-    public ProxyServiceInvocation(ChannelPool channelPool, ClientContext context, List<Interceptor> interceptors) {
+    private Class<?> proxyedInterface;
+
+    public ProxyServiceInvocation(Class<?> proxyedInterface, ChannelPool channelPool,
+                                  ClientContext context, List<Interceptor> interceptors) {
+        this.proxyedInterface = proxyedInterface;
         this.channelPool = channelPool;
         this.context = context;
         this.interceptors = interceptors;
@@ -31,37 +35,43 @@ public class ProxyServiceInvocation implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Channel channel = channelPool.acquire().get();
-        try {
-            //调用元数据
-            InvokeMeta meta = context.getInvokeMeta(method);
-            RequestMessage request = getRequestMessage(meta, args);
+        if (method.getDeclaringClass().equals(proxyedInterface) && !method.isDefault()) {
+            Channel channel = channelPool.acquire().get();
+            try {
+                //调用元数据
+                InvokeMeta meta = context.getInvokeMeta(method);
+                RequestMessage request = getRequestMessage(meta, args);
 
-            //获取请求唯一键
-            int sequence = context.getSequence();
-            request.setSequence(sequence);
-            //获得future
-            Future<ResponseMessage> future = context.getFuture(sequence);
+                //获取请求唯一键
+                int sequence = context.getSequence();
+                request.setSequence(sequence);
+                //获得future
+                Future<ResponseMessage> future = context.getFuture(sequence);
 
-            //拦截器 preHandle
-            interceptors.stream().forEach(interceptor -> interceptor.preHandle(request));
-            //正式发送请求
-            channel.writeAndFlush(request);
+                //拦截器 preHandle
+                interceptors.stream().forEach(interceptor -> interceptor.preHandle(request));
+                //正式发送请求
+                channel.writeAndFlush(request);
 
-            ResponseMessage response = future.get();
+                ResponseMessage response = future.get();
 
-            //拦截器 postHandle
-            interceptors.stream().forEach(interceptor -> interceptor.postHandle(request, response));
+                //拦截器 postHandle
+                interceptors.stream().forEach(interceptor -> interceptor.postHandle(request, response));
 
-            if (response.getExceptionMessage() != null) {
-                throw new InvokeException(response.getExceptionMessage());
-            }
-            return response.getResponse();
-        } finally {
-            if (channel != null) {
-                channelPool.release(channel);
+                if (response.getExceptionMessage() != null) {
+                    throw new InvokeException(response.getExceptionMessage());
+                }
+                return response.getResponse();
+            } finally {
+                if (channel != null) {
+                    channelPool.release(channel);
+                }
             }
         }
+        else {
+            return method.invoke(proxy, args);
+        }
+
     }
 
 

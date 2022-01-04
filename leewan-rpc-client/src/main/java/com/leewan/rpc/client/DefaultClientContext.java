@@ -41,7 +41,7 @@ public class DefaultClientContext implements ClientContext {
         this.init();
         Object service = Proxy.newProxyInstance(getClass().getClassLoader(),
                 new Class[]{inter},
-                new ProxyServiceInvocation(channelPool, this, interceptors));
+                new ProxyServiceInvocation(inter, channelPool, this, interceptors));
         return (T) service;
     }
 
