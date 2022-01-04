@@ -93,7 +93,8 @@ public class DefaultClientContext implements ClientContext {
             Bootstrap bootstrap = new Bootstrap()
                     .group(new NioEventLoopGroup())
                     .channel(NioSocketChannel.class)
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, configuration.getConnectTimeout());
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, configuration.getConnectTimeout())
+                    .remoteAddress(configuration.getRemoteAddress(), configuration.getPort());
 
             channelPool = new FixedChannelPool(bootstrap,
                     new ClientChannelPoolHandler(configuration, this),
