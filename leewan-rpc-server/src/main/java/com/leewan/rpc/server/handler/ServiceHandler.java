@@ -29,6 +29,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> 
         DefaultFilterChain filterChain = new DefaultFilterChain();
         filters.stream().forEach(filterChain::addFilter);
         filterChain.addFilter(this);
+        this.filterChain = filterChain;
     }
 
     @Override
