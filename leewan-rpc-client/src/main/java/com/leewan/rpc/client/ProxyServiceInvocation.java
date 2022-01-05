@@ -58,8 +58,8 @@ public class ProxyServiceInvocation implements InvocationHandler {
                 //拦截器 postHandle
                 interceptors.stream().forEach(interceptor -> interceptor.postHandle(request, response));
 
-                if (response.getExceptionMessage() != null) {
-                    throw new InvokeException(response.getExceptionMessage());
+                if (response.getExceptionType() != null) {
+                    throw new InvokeException(getExceptionMsg(response));
                 }
                 return response.getResponse();
             } finally {
@@ -74,6 +74,13 @@ public class ProxyServiceInvocation implements InvocationHandler {
 
     }
 
+    private String getExceptionMsg(ResponseMessage response){
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("【").append(response.getExceptionType()).append("】")
+                .append(response.getExceptionMessage());
+        return builder.toString();
+    }
 
     private RequestMessage getRequestMessage(InvokeMeta meta, Object[] args) {
         RequestMessage request = new RequestMessage();

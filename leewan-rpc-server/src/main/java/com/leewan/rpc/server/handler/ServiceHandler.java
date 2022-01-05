@@ -21,7 +21,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> 
 
     private ServiceContainer serviceContainer;
 
-    private FilterChain filterChain;
+    private DefaultFilterChain filterChain;
 
     public ServiceHandler(ServiceContainer serviceContainer, List<Filter> filters) {
         super();
@@ -35,7 +35,13 @@ public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage msg) throws Exception {
         ResponseMessage response = new ResponseMessage();
-        this.filterChain.doFilter(msg, response);
+        try {
+            this.filterChain.doFilter(msg, response);
+        } finally {
+            //调用链回到初始位置
+            filterChain.reset();
+        }
+
         response.setSequence(msg.getSequence());
         ctx.writeAndFlush(response);
     }
@@ -51,14 +57,10 @@ public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> 
     @Override
     public void doFilter(RequestMessage request, ResponseMessage response, FilterChain chain) {
         InvokeMeta meta = request.getInvokeMeta();
-        try {
-            Invoke invoke = serviceContainer.getInvoke(meta);
-            Object result = invoke.invoke(formatParameters(request.getParameters()));
-            response.setResponse(result);
-            response.setInvokeId(meta.getInvokeId());
-        }catch (Exception e) {
-            log.error(e.getMessage(), e);
-            response.setExceptionMessage(e.getMessage());
-        }
+        Invoke invoke = serviceContainer.getInvoke(meta);
+        Object result = invoke.invoke(formatParameters(request.getParameters()));
+        response.setResponse(result);
+        response.setInvokeId(meta.getInvokeId());
     }
+
 }

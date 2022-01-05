@@ -33,15 +33,19 @@ public class DefaultFilterChain implements FilterChain {
         return filter;
     }
 
+    public void reset(){
+        index.remove();
+    }
     @Override
     public void doFilter(RequestMessage request, ResponseMessage response) {
         Filter filter = next();
         if (filter != null) {
             try {
                 filter.doFilter(request, response, this);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error(e.getMessage(), e);
-                response.setExceptionMessage(response.getExceptionMessage());
+                response.setExceptionMessage(e.getMessage());
+                response.setExceptionType(e.getClass().getName());
             }
         }
     }

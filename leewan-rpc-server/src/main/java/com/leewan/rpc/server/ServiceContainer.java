@@ -74,6 +74,7 @@ public class ServiceContainer {
                 Integer id = invokeMetaIdMap.get(methodMeta);
                 if (id == null) {
                     Object service = services.get(interClazz);
+                    Assert.notNull(service, "找不到服务");
                     Invoke invoke = createInvoke(service, methodMeta);
                     id = sequence.incrementAndGet();
                     invokeMetaIdMap.put(methodMeta, id);
