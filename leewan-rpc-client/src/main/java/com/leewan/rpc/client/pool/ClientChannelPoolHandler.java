@@ -12,6 +12,9 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.pool.AbstractChannelPoolHandler;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.compression.JdkZlibEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author chenjw
@@ -31,6 +34,8 @@ public class ClientChannelPoolHandler extends AbstractChannelPoolHandler {
     @Override
     public void channelCreated(Channel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
+        pipeline.addLast(new IdleStateHandler(0,configuration.getIdleHeartBeat(),0, TimeUnit.SECONDS));
+
         pipeline.addLast(new LengthFieldBasedFrameDecoder(
                 configuration.getMaxMessageSize(), 0, 4, 0,4));
         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
@@ -38,6 +43,6 @@ public class ClientChannelPoolHandler extends AbstractChannelPoolHandler {
         pipeline.addLast(new KryoMessageEncoder());
         pipeline.addLast(new KryoMessageDecoder());
         pipeline.addLast(new ResponseMessageHandler(container));
-        pipeline.addLast(new IdleHeartBeatHandler(configuration.getIdleHeartBeat()));
+        pipeline.addLast(new IdleHeartBeatHandler());
     }
 }

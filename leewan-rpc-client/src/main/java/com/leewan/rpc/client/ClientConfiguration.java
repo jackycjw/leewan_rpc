@@ -14,5 +14,5 @@ public class ClientConfiguration extends Configuration {
 
     private int maxConnections = 5;
 
-    private int idleHeartBeat = 10;
+    private int idleHeartBeat = 20;
 }
