@@ -70,7 +70,7 @@ public class ServiceContainer {
         } else {
             String clazzName = methodMeta.getClazzName();
             Class<?> interClazz = Class.forName(clazzName);
-            synchronized (interClazz) {
+            synchronized (this) {
                 Integer id = invokeMetaIdMap.get(methodMeta);
                 if (id == null) {
                     Object service = services.get(interClazz);

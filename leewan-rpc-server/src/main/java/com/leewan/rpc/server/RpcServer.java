@@ -3,9 +3,9 @@ package com.leewan.rpc.server;
 
 import com.leewan.rpc.server.filter.Filter;
 import com.leewan.rpc.server.handler.ServiceHandler;
+import com.leewan.rpc.share.handler.KryoMessageDecoder;
+import com.leewan.rpc.share.handler.KryoMessageEncoder;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
-import com.leewan.rpc.share.handler.codec.KryoRequestMessageDecoder;
-import com.leewan.rpc.share.handler.codec.KryoResponseMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -76,8 +76,8 @@ public class RpcServer {
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
                         pipeline.addLast(new JdkZlibDecoder());
-                        pipeline.addLast(new KryoRequestMessageDecoder());
-                        pipeline.addLast(new KryoResponseMessageEncoder());
+                        pipeline.addLast(new KryoMessageDecoder());
+                        pipeline.addLast(new KryoMessageEncoder());
                         pipeline.addLast(serviceGroup, new ServiceHandler(serviceContainer, filters));
                     }
                 })

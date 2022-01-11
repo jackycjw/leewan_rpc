@@ -1,11 +1,15 @@
 package com.leewan.rpc.share.message;
 
-import lombok.Data;
-
 import java.io.Serializable;
 
-@Data
-public abstract class Message implements Serializable {
-    //消息标记 每个通道里的消息顺序号
-    private int sequence;
+/**
+ * @author chenjw
+ * @Date 2022/1/11 12:47
+ */
+public interface Message extends Serializable {
+    byte TYPE_REQUEST_MESSAGE = 0;
+    byte TYPE_RESPONSE_MESSAGE = 1;
+    byte TYPE_HEART_BEAT = 2;
+
+    byte getType();
 }

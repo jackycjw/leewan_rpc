@@ -11,7 +11,7 @@ import java.util.Map;
  * 最底层的消息体
  */
 @Data
-public class RequestMessage extends Message {
+public class RequestMessage extends SequenceMessage {
     /**
      * 方法元数据
      */
@@ -25,4 +25,9 @@ public class RequestMessage extends Message {
      * 方法入参
      */
     private List<Object> parameters = new ArrayList<>(3);
+
+    @Override
+    public byte getType() {
+        return TYPE_REQUEST_MESSAGE;
+    }
 }

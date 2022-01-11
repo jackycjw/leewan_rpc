@@ -13,4 +13,6 @@ public class ClientConfiguration extends Configuration {
     private int connectTimeout = 5000;
 
     private int maxConnections = 5;
+
+    private int idleHeartBeat = 10;
 }
