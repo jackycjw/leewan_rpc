@@ -27,7 +27,7 @@ public class KryoMessageDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         byte type = in.readByte();
-        Class<?> clazz = null;
+        Class<? extends Message> clazz;
         switch (type) {
             case TYPE_REQUEST_MESSAGE:
                 clazz = RequestMessage.class;
@@ -43,8 +43,8 @@ public class KryoMessageDecoder extends ByteToMessageDecoder {
         }
         byte[] bs = new byte[in.readableBytes()];
         in.readBytes(bs);
-        RequestMessage requestMessage = kryo.readObject(new Input(bs), RequestMessage.class);
-        out.add(requestMessage);
+        Message message = kryo.readObject(new Input(bs), clazz);
+        out.add(message);
     }
 
 }
