@@ -22,7 +22,7 @@ public class IdleHeartBeatHandler extends ChannelInboundHandlerAdapter {
             if (state == IdleState.WRITER_IDLE) {
                 //防止断链
                 ctx.channel().writeAndFlush(new HeartBeat());
-                log.debug("心跳包");
+                log.debug("send heartbeat package");
             }
         } else {
             super.userEventTriggered(ctx, evt);
