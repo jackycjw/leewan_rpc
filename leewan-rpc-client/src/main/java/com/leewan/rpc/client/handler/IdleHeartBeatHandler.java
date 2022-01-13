@@ -28,4 +28,15 @@ public class IdleHeartBeatHandler extends ChannelInboundHandlerAdapter {
             super.userEventTriggered(ctx, evt);
         }
     }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.error("channel {} inactive", ctx.channel());
+    }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error(cause.getMessage(), cause);
+    }
 }

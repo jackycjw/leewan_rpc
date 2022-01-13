@@ -13,6 +13,7 @@ import io.netty.channel.pool.AbstractChannelPoolHandler;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.compression.JdkZlibEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @author chenjw
  * @Date 2021/12/30 14:52
  */
+@Slf4j
 public class ClientChannelPoolHandler extends AbstractChannelPoolHandler {
 
     private ClientConfiguration configuration;
@@ -33,6 +35,7 @@ public class ClientChannelPoolHandler extends AbstractChannelPoolHandler {
 
     @Override
     public void channelCreated(Channel ch) throws Exception {
+        log.info("new channel {} created", ch);
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new IdleStateHandler(0,configuration.getIdleHeartBeat(),0, TimeUnit.SECONDS));
 
