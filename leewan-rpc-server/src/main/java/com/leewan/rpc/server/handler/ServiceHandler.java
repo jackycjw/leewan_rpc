@@ -23,7 +23,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> 
 
     private DefaultFilterChain filterChain;
 
-    public    ServiceHandler(ServiceContainer serviceContainer, List<Filter> filters) {
+    public ServiceHandler(ServiceContainer serviceContainer, List<Filter> filters) {
         super();
         this.serviceContainer = serviceContainer;
         DefaultFilterChain filterChain = new DefaultFilterChain();
