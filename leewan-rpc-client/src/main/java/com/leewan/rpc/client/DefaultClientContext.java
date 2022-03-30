@@ -58,14 +58,6 @@ public class DefaultClientContext implements ClientContext {
 
 
 
-    private CompletableFuture<ResponseMessage> getFuture(RequestMessage request){
-        int seq = sequence.incrementAndGet();
-        request.setSequence(seq);
-        CompletableFuture<ResponseMessage> future = new CompletableFuture<>();
-        promises.put(seq, future);
-        return future;
-    }
-
     public InvokeMeta getInvokeMeta(Method method){
         if (invokeMetaMap.containsKey(method)) {
             return invokeMetaMap.get(method);
