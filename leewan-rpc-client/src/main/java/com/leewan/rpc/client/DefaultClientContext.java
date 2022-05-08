@@ -1,9 +1,10 @@
 package com.leewan.rpc.client;
 
+import com.leewan.rpc.client.call.CallPerformance;
 import com.leewan.rpc.client.intercept.Interceptor;
 import com.leewan.rpc.client.pool.ClientChannelPoolHandler;
+import com.leewan.rpc.share.call.Call;
 import com.leewan.rpc.share.message.InvokeMeta;
-import com.leewan.rpc.share.message.RequestMessage;
 import com.leewan.rpc.share.message.ResponseMessage;
 import com.leewan.rpc.share.util.Assert;
 import io.netty.bootstrap.Bootstrap;
@@ -14,10 +15,7 @@ import io.netty.channel.pool.FixedChannelPool;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -71,6 +69,30 @@ public class DefaultClientContext implements ClientContext {
         meta.setParameterTypeNames(parameterTypeNames);
         invokeMetaMap.put(method, meta);
         return meta;
+    }
+
+    private Map<Method, CallPerformance> requestTimeoutMap = new HashMap<>();
+    @Override
+    public CallPerformance getCallPerformance(Method method) {
+        if (requestTimeoutMap.containsKey(method)) {
+            return requestTimeoutMap.get(method);
+        } else {
+            int requestTimeout = configuration.getRequestTimeout();
+            int retry = configuration.getRetry();
+            CallPerformance performance = new CallPerformance(requestTimeout, retry);
+
+            Call call = method.getAnnotation(Call.class);
+            if (call != null) {
+                if (call.retry() > -1) {
+                    performance.setRetry(call.retry());
+                }
+                if (call.requestTimeout() > -1) {
+                    performance.setRequestTimeout(call.requestTimeout());
+                }
+            }
+            requestTimeoutMap.put(method, performance);
+            return performance;
+        }
     }
 
     private void init(){
