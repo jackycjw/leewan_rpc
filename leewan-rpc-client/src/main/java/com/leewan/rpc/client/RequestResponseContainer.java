@@ -17,11 +17,11 @@ public interface RequestResponseContainer {
     int getSequence();
 
     /**
-     * 获取Future
+     * 创建Future
      * @param sequence
      * @return
      */
-    Future<ResponseMessage> getFuture(int sequence);
+    Future<ResponseMessage> createFuture(int sequence);
 
 
     /**

@@ -128,7 +128,7 @@ public class DefaultClientContext implements ClientContext {
     }
 
     @Override
-    public Future<ResponseMessage> getFuture(int sequence) {
+    public Future<ResponseMessage> createFuture(int sequence) {
         CompletableFuture<ResponseMessage> future = new CompletableFuture<>();
         promises.put(sequence, future);
         return future;

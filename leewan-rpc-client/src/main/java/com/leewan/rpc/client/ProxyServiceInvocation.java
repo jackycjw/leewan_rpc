@@ -55,7 +55,7 @@ public class ProxyServiceInvocation implements InvocationHandler {
                     int sequence = context.getSequence();
                     request.setSequence(sequence);
                     //获得future
-                    Future<ResponseMessage> future = context.getFuture(sequence);
+                    Future<ResponseMessage> future = context.createFuture(sequence);
 
                     //拦截器 preHandle
                     interceptors.stream().forEach(interceptor -> interceptor.preHandle(request));
