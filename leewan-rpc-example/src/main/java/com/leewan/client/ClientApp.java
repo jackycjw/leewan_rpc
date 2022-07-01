@@ -14,8 +14,8 @@ public class ClientApp {
 
     public static void main(String[] args) {
         ClientConfiguration configuration = new ClientConfiguration();
-        configuration.getPoolConfiguration().setMaxIdle(2);
-        configuration.getPoolConfiguration().setMaxTotal(2);
+        configuration.setMaxIdle(2);
+        configuration.setMaxTotal(2);
         ClientContext clientContext = new DefaultClientContext(configuration);
         IService service = clientContext.getService(IService.class);
 

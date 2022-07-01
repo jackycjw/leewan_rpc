@@ -9,9 +9,8 @@ import com.leewan.rpc.share.handler.KryoMessageDecoder;
 import com.leewan.rpc.share.handler.KryoMessageEncoder;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -43,6 +42,15 @@ public class PooledChannelFactory implements PooledObjectFactory<Channel> {
                         //
                         pipeline.addLast(new LengthFieldBasedFrameDecoder(
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
+                        pipeline.addLast(new ChannelInboundHandlerAdapter() {
+                            @Override
+                            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                                if (msg instanceof ByteBuf buf) {
+                                    log.debug("收到: {}", buf.readableBytes());
+                                }
+                                super.channelRead(ctx, msg);
+                            }
+                        });
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
                         pipeline.addLast(new JdkZlibEncoder());
 

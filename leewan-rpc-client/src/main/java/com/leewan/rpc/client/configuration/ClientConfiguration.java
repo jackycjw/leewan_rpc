@@ -34,18 +34,26 @@ public class ClientConfiguration extends Configuration {
      */
     private int threadNum = 0;
 
-    private PoolConfiguration poolConfiguration = new PoolConfiguration();
+
+    private int maxTotal = GenericObjectPoolConfig.DEFAULT_MAX_TOTAL;
+    private int maxIdle = GenericObjectPoolConfig.DEFAULT_MAX_IDLE;
+    private int minIdle = GenericObjectPoolConfig.DEFAULT_MIN_IDLE;
+    private int maxWait = -1;
+    private long minEvictableIdleTimeMillis =  1000L * 60L * 30L;
+    private boolean testOnBorrow = true;
+    private boolean testOnReturn = true;
+    private int timeBetweenEvictionRunsMillis;
 
     public GenericObjectPoolConfig<Channel> getPoolConfig(){
         GenericObjectPoolConfig<Channel> config = new GenericObjectPoolConfig<>();
-        config.setMaxTotal(poolConfiguration.getMaxTotal());
-        config.setMaxIdle(poolConfiguration.getMaxIdle());
-        config.setMinIdle(poolConfiguration.getMinIdle());
-        config.setMaxWait(Duration.ofMillis(poolConfiguration.getMaxWait()));
-        config.setMinEvictableIdleTime(Duration.ofMillis(poolConfiguration.getMinEvictableIdleTimeMillis()));
-        config.setTestOnBorrow(poolConfiguration.isTestOnBorrow());
-        config.setTestOnBorrow(poolConfiguration.isTestOnReturn());
-        config.setTimeBetweenEvictionRuns(Duration.ofMillis(poolConfiguration.getTimeBetweenEvictionRunsMillis()));
+        config.setMaxTotal(maxTotal);
+        config.setMaxIdle(maxIdle);
+        config.setMinIdle(minIdle);
+        config.setMaxWait(Duration.ofMillis(maxWait));
+        config.setMinEvictableIdleTime(Duration.ofMillis(minEvictableIdleTimeMillis));
+        config.setTestOnBorrow(testOnBorrow);
+        config.setTestOnBorrow(testOnReturn);
+        config.setTimeBetweenEvictionRuns(Duration.ofMillis(timeBetweenEvictionRunsMillis));
         return config;
     }
 
