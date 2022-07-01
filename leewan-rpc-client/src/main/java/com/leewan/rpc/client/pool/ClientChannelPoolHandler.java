@@ -1,9 +1,9 @@
 package com.leewan.rpc.client.pool;
 
-import com.leewan.rpc.client.ClientConfiguration;
-import com.leewan.rpc.client.RequestResponseContainer;
-import com.leewan.rpc.client.handler.IdleHeartBeatHandler;
-import com.leewan.rpc.client.handler.ResponseMessageHandler;
+import com.leewan.rpc.client.configuration.ClientConfiguration;
+import com.leewan.rpc.client.context.RequestResponseContainer;
+import com.leewan.rpc.client.context.netty.handler.IdleHeartBeatHandler;
+import com.leewan.rpc.client.context.netty.handler.ResponseMessageHandler;
 import com.leewan.rpc.share.handler.KryoMessageDecoder;
 import com.leewan.rpc.share.handler.KryoMessageEncoder;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ClientChannelPoolHandler extends AbstractChannelPoolHandler {
 
-    private ClientConfiguration configuration;
+    private final ClientConfiguration configuration;
 
-    private RequestResponseContainer container;
+    private final RequestResponseContainer container;
 
     public ClientChannelPoolHandler(ClientConfiguration configuration, RequestResponseContainer container) {
         this.configuration = configuration;
@@ -34,7 +34,7 @@ public class ClientChannelPoolHandler extends AbstractChannelPoolHandler {
     }
 
     @Override
-    public void channelCreated(Channel ch) throws Exception {
+    public void channelCreated(Channel ch) {
         log.info("new channel {} created", ch);
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new IdleStateHandler(0,configuration.getIdleHeartBeat(),0, TimeUnit.SECONDS));

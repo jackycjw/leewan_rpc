@@ -13,6 +13,7 @@
         <module>leewan-rpc-client</module>
         <module>leewan-rpc-server</module>
         <module>leewan-rpc-share</module>
+        <module>leewan-rpc-example</module>
     </modules>
 
     <properties>

@@ -1,5 +1,3 @@
-package com.leewan.rpc.client;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;

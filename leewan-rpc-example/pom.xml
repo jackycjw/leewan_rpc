@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>leewan-rpc-client</artifactId>
+    <artifactId>leewan-rpc-example</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -19,13 +19,14 @@
     <dependencies>
         <dependency>
             <groupId>com.leewan</groupId>
-            <artifactId>leewan-rpc-share</artifactId>
+            <artifactId>leewan-rpc-client</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <version>2.11.1</version>
+            <groupId>com.leewan</groupId>
+            <artifactId>leewan-rpc-server</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

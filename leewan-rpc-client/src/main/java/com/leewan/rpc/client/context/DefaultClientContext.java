@@ -1,6 +1,9 @@
-package com.leewan.rpc.client;
+package com.leewan.rpc.client.context;
 
 import com.leewan.rpc.client.call.CallPerformance;
+import com.leewan.rpc.client.configuration.ClientConfiguration;
+import com.leewan.rpc.client.context.netty.PooledChannelFactory;
+import com.leewan.rpc.client.context.proxy.ProxyServiceInvocation;
 import com.leewan.rpc.client.intercept.Interceptor;
 import com.leewan.rpc.client.pool.ClientChannelPoolHandler;
 import com.leewan.rpc.share.call.Call;
@@ -13,6 +16,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.pool.ChannelPool;
 import io.netty.channel.pool.FixedChannelPool;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.*;
@@ -24,13 +29,14 @@ import java.util.stream.Collectors;
 
 public class DefaultClientContext implements ClientContext {
 
-    private ClientConfiguration configuration;
+    private final ClientConfiguration configuration;
 
     public DefaultClientContext(ClientConfiguration configuration) {
         this.configuration = configuration;
     }
 
-    private ChannelPool channelPool;
+//    private ChannelPool channelPool;
+    private GenericObjectPool<Channel> channelPool;
 
     private boolean inited = false;
 
@@ -43,7 +49,7 @@ public class DefaultClientContext implements ClientContext {
         return (T) service;
     }
 
-    private List<Interceptor> interceptors = new ArrayList<>(1);
+    private final List<Interceptor> interceptors = new ArrayList<>(1);
 
     @Override
     public void registerInterceptor(Interceptor interceptor) {
@@ -71,7 +77,7 @@ public class DefaultClientContext implements ClientContext {
         return meta;
     }
 
-    private Map<Method, CallPerformance> requestTimeoutMap = new HashMap<>();
+    private final Map<Method, CallPerformance> requestTimeoutMap = new HashMap<>();
     @Override
     public CallPerformance getCallPerformance(Method method) {
         if (requestTimeoutMap.containsKey(method)) {
@@ -95,7 +101,10 @@ public class DefaultClientContext implements ClientContext {
         }
     }
 
-    private void init(){
+    /**
+     * 初始化网络连接
+     */
+    protected void init(){
         if (inited) {
             return;
         }
@@ -103,16 +112,8 @@ public class DefaultClientContext implements ClientContext {
             if (inited) {
                 return;
             }
-
-            Bootstrap bootstrap = new Bootstrap()
-                    .group(new NioEventLoopGroup())
-                    .channel(NioSocketChannel.class)
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, configuration.getConnectTimeout())
-                    .remoteAddress(configuration.getRemoteAddress(), configuration.getPort());
-
-            channelPool = new FixedChannelPool(bootstrap,
-                    new ClientChannelPoolHandler(configuration, this),
-                    configuration.getMaxConnections());
+            PooledChannelFactory factory = new PooledChannelFactory(configuration, this);
+            channelPool = new GenericObjectPool<>(factory, configuration.getPoolConfig());
             inited = true;
         }
     }

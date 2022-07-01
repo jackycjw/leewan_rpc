@@ -1,4 +1,4 @@
-package com.leewan.rpc.client;
+package com.leewan.rpc.client.context;
 
 import com.leewan.rpc.share.message.ResponseMessage;
 
@@ -12,21 +12,21 @@ public interface RequestResponseContainer {
 
     /**
      * 获取请求序号
-     * @return
+     * @return 请求的序号
      */
     int getSequence();
 
     /**
      * 创建Future
-     * @param sequence
-     * @return
+     * @param sequence 根据请求序号创建Future
+     * @return Future
      */
     Future<ResponseMessage> createFuture(int sequence);
 
 
     /**
      *
-     * @param response
+     * @param response 相应体
      */
     void completeFuture(int sequence, ResponseMessage response);
 

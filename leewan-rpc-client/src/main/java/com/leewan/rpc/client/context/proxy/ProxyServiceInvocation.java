@@ -1,6 +1,7 @@
-package com.leewan.rpc.client;
+package com.leewan.rpc.client.context.proxy;
 
 import com.leewan.rpc.client.call.CallPerformance;
+import com.leewan.rpc.client.context.ClientContext;
 import com.leewan.rpc.client.except.InvokeException;
 import com.leewan.rpc.client.intercept.Interceptor;
 import com.leewan.rpc.share.message.InvokeMeta;
@@ -9,6 +10,7 @@ import com.leewan.rpc.share.message.ResponseMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.pool.ChannelPool;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,15 +23,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProxyServiceInvocation implements InvocationHandler {
 
-    private ChannelPool channelPool;
+    private final GenericObjectPool<Channel> channelPool;
 
-    private ClientContext context;
+    private final ClientContext context;
 
-    private List<Interceptor> interceptors;
+    private final List<Interceptor> interceptors;
 
-    private Class<?> proxyedInterface;
+    private final Class<?> proxyedInterface;
 
-    public ProxyServiceInvocation(Class<?> proxyedInterface, ChannelPool channelPool,
+    public ProxyServiceInvocation(Class<?> proxyedInterface, GenericObjectPool<Channel> channelPool,
                                   ClientContext context, List<Interceptor> interceptors) {
         this.proxyedInterface = proxyedInterface;
         this.channelPool = channelPool;
@@ -45,7 +47,7 @@ public class ProxyServiceInvocation implements InvocationHandler {
             int retry = performance.getRetry();
             do {
                 retry--;
-                Channel channel = channelPool.acquire().get();
+                Channel channel = channelPool.borrowObject();
                 try {
                     //调用元数据
                     InvokeMeta meta = context.getInvokeMeta(method);
@@ -75,7 +77,7 @@ public class ProxyServiceInvocation implements InvocationHandler {
                     exception = e;
                 } finally {
                     if (channel != null) {
-                        channelPool.release(channel);
+                        channelPool.returnObject(channel);
                     }
                 }
                 if (retry >= 0 ) {

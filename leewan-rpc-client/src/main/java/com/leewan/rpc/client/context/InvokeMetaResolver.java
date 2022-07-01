@@ -1,4 +1,4 @@
-package com.leewan.rpc.client;
+package com.leewan.rpc.client.context;
 
 import com.leewan.rpc.client.call.CallPerformance;
 import com.leewan.rpc.share.message.InvokeMeta;
@@ -15,8 +15,8 @@ public interface InvokeMetaResolver {
 
     /**
      * 获取请求的执行超时时长
-     * @param method
-     * @return
+     * @param method 方法对象
+     * @return 调用参数
      */
     CallPerformance getCallPerformance(Method method);
 }

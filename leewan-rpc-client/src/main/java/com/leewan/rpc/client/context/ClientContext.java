@@ -1,4 +1,4 @@
-package com.leewan.rpc.client;
+package com.leewan.rpc.client.context;
 
 import com.leewan.rpc.client.intercept.Interceptor;
 /**
@@ -9,9 +9,8 @@ public interface ClientContext extends InvokeMetaResolver, RequestResponseContai
 
     /**
      * 获取服务实例
-     * @param service
-     * @return
-     * @param <T>
+     * @param service 服务接口类
+     * @return 服务对象
      */
     <T> T getService(Class<T> service);
 

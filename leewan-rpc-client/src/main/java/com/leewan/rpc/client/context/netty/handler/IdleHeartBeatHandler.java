@@ -1,4 +1,4 @@
-package com.leewan.rpc.client.handler;
+package com.leewan.rpc.client.context.netty.handler;
 
 import com.leewan.rpc.share.message.HeartBeat;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,13 +30,13 @@ public class IdleHeartBeatHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         log.error("channel {} inactive", ctx.channel());
     }
 
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error(cause.getMessage(), cause);
     }
 }
