@@ -5,7 +5,7 @@
     <parent>
         <artifactId>leewan-rpc</artifactId>
         <groupId>com.leewan</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.leewan</groupId>
             <artifactId>leewan-rpc-share</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
