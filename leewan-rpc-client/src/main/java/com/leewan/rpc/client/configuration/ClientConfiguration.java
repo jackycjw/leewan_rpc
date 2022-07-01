@@ -27,8 +27,6 @@ public class ClientConfiguration extends Configuration {
     private int retry = 0;
 
 
-    private int maxConnections = 5;
-
     private int idleHeartBeat = 20;
 
     /**
