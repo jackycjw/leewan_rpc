@@ -71,7 +71,10 @@ public class ProxyServiceInvocation implements InvocationHandler {
                         throw new InvokeException(response.getExceptionMessage(), response.getExceptionType());
                     }
                     return response.getResponse();
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
+                    // 业务异常直接抛出
+                    throw e;
+                }catch (Exception e) {
                     log.error(e.getMessage(), e);
                     channel.close();
                     exception = e;
