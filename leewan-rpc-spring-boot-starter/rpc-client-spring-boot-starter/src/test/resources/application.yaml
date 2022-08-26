@@ -1,0 +1,4 @@
+leewan-rpc:
+  client:
+    enable: true
+    remote-address: localhost

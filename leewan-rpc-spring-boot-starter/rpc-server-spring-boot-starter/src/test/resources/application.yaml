@@ -1,0 +1,3 @@
+leewan-rpc:
+  server:
+    enable: true

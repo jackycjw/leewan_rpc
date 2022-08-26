@@ -8,17 +8,19 @@
     <groupId>com.leewan</groupId>
     <artifactId>leewan-rpc</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-RELEASE</version>
+    <version>${revision}</version>
     <modules>
+        <module>leewan-rpc-share</module>
         <module>leewan-rpc-client</module>
         <module>leewan-rpc-server</module>
-        <module>leewan-rpc-share</module>
         <module>leewan-rpc-example</module>
+        <module>leewan-rpc-spring-boot-starter</module>
     </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <revision>1.1</revision>
     </properties>
 
     <dependencies>
