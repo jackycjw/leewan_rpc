@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <artifactId>leewan-rpc</artifactId>
+        <groupId>com.leewan</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>leewan-rpc-dependencies-bom</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <depend-revision>1.1</depend-revision>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.leewan</groupId>
+                <artifactId>leewan-rpc</artifactId>
+                <version>${depend-revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.leewan</groupId>
+                <artifactId>leewan-rpc-client</artifactId>
+                <version>${depend-revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.leewan</groupId>
+                <artifactId>leewan-rpc-server</artifactId>
+                <version>${depend-revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.leewan</groupId>
+                <artifactId>leewan-rpc-share</artifactId>
+                <version>${depend-revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.leewan</groupId>
+                <artifactId>leewan-rpc-spring-boot-starter</artifactId>
+                <version>${depend-revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.leewan</groupId>
+                <artifactId>rpc-client-spring-boot-starter</artifactId>
+                <version>${depend-revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.leewan</groupId>
+                <artifactId>rpc-server-spring-boot-starter</artifactId>
+                <version>${depend-revision}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

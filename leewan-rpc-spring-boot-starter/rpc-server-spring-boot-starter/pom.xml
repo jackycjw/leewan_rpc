@@ -6,10 +6,8 @@
         <artifactId>leewan-rpc-spring-boot-starter</artifactId>
         <groupId>com.leewan</groupId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>rpc-server-spring-boot-starter</artifactId>
 
     <properties>
@@ -22,7 +20,7 @@
         <dependency>
             <groupId>com.leewan</groupId>
             <artifactId>leewan-rpc-server</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

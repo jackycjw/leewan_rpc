@@ -6,10 +6,8 @@
         <artifactId>leewan-rpc</artifactId>
         <groupId>com.leewan</groupId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>${revision}</version>
     <artifactId>leewan-rpc-client</artifactId>
 
     <properties>
@@ -21,7 +19,7 @@
         <dependency>
             <groupId>com.leewan</groupId>
             <artifactId>leewan-rpc-share</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
