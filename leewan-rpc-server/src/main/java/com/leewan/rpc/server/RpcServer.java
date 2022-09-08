@@ -3,6 +3,7 @@ package com.leewan.rpc.server;
 
 import com.leewan.rpc.server.filter.Filter;
 import com.leewan.rpc.server.handler.ServiceHandler;
+import com.leewan.rpc.server.internal.HeartBeatServiceImpl;
 import com.leewan.rpc.share.handler.KryoMessageDecoder;
 import com.leewan.rpc.share.handler.KryoMessageEncoder;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
@@ -60,6 +61,8 @@ public class RpcServer {
 
     @SneakyThrows
     public void start()  {
+        // 绑定心跳服务
+        bind(new HeartBeatServiceImpl());
         boss = new NioEventLoopGroup();
         worker = new NioEventLoopGroup();
 

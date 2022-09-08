@@ -8,6 +8,7 @@ import com.leewan.rpc.client.context.netty.handler.ResponseMessageHandler;
 import com.leewan.rpc.share.handler.KryoMessageDecoder;
 import com.leewan.rpc.share.handler.KryoMessageEncoder;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
+import com.leewan.rpc.share.internal.service.HeartBeatService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -26,12 +27,16 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class PooledChannelFactory implements PooledObjectFactory<Channel> {
 
+    private ClientContext context;
     private final Bootstrap bootstrap;
+    private HeartBeatService heartBeatService;
 
-    public PooledChannelFactory(ClientConfiguration configuration, RequestResponseContainer container) {
+
+    public PooledChannelFactory(ClientConfiguration configuration, ClientContext context, NioEventLoopGroup executors) {
         bootstrap = new Bootstrap();
+        this.context = context;
         bootstrap.channel(NioSocketChannel.class)
-                .group(new NioEventLoopGroup(configuration.getThreadNum()))
+                .group(executors)
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) {
@@ -57,11 +62,15 @@ public class PooledChannelFactory implements PooledObjectFactory<Channel> {
                         pipeline.addLast(new KryoMessageEncoder());
                         pipeline.addLast(new KryoMessageDecoder());
 
-                        pipeline.addLast(new ResponseMessageHandler(container));
-                        pipeline.addLast(new IdleHeartBeatHandler());
+                        pipeline.addLast(new ResponseMessageHandler(context));
+                        pipeline.addLast(new IdleHeartBeatHandler(heartBeatService));
                     }
                 })
                 .remoteAddress(configuration.getRemoteAddress(), configuration.getPort());
+    }
+
+    public void initHeartBeatService(){
+        heartBeatService = context.getService(HeartBeatService.class);
     }
 
     @Override

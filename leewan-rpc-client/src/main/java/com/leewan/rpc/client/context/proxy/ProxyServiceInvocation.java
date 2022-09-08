@@ -1,14 +1,15 @@
 package com.leewan.rpc.client.context.proxy;
 
-import com.leewan.rpc.client.call.CallPerformance;
+import com.leewan.rpc.client.context.call.CallPerformance;
 import com.leewan.rpc.client.context.ClientContext;
+import com.leewan.rpc.client.context.call.ExecuteCall;
 import com.leewan.rpc.client.except.InvokeException;
 import com.leewan.rpc.client.intercept.Interceptor;
 import com.leewan.rpc.share.message.InvokeMeta;
 import com.leewan.rpc.share.message.RequestMessage;
 import com.leewan.rpc.share.message.ResponseMessage;
+import com.leewan.rpc.share.util.ObjectUtils;
 import io.netty.channel.Channel;
-import io.netty.channel.pool.ChannelPool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 
@@ -47,8 +48,9 @@ public class ProxyServiceInvocation implements InvocationHandler {
             int retry = performance.getRetry();
             do {
                 retry--;
-                Channel channel = channelPool.borrowObject();
+                Channel channel = null;
                 try {
+                    channel = channelPool.borrowObject();
                     //调用元数据
                     InvokeMeta meta = context.getInvokeMeta(method);
                     RequestMessage request = getRequestMessage(meta, args);
@@ -56,21 +58,29 @@ public class ProxyServiceInvocation implements InvocationHandler {
                     //获取请求唯一键
                     int sequence = context.getSequence();
                     request.setSequence(sequence);
-                    //获得future
-                    Future<ResponseMessage> future = context.createFuture(sequence);
 
-                    //拦截器 preHandle
+                    //拦截器 前置 preHandle
                     interceptors.stream().forEach(interceptor -> interceptor.preHandle(request));
-                    //正式发送请求
-                    channel.writeAndFlush(request);
-                    ResponseMessage response = future.get(performance.getRequestTimeout(), TimeUnit.MILLISECONDS);
-                    //拦截器 postHandle
-                    interceptors.stream().forEach(interceptor -> interceptor.postHandle(request, response));
-
-                    if (response.getExceptionType() != null) {
-                        throw new InvokeException(response.getExceptionMessage(), response.getExceptionType());
+                    //异步
+                    if (ExecuteCall.isCurrentAsyn()) {
+                        context.saveCallback(request, ExecuteCall.getCurrentConsumer(), performance);
+                        //正式发送请求
+                        channel.writeAndFlush(request);
+                        return ObjectUtils.getDefaultBasicValue(method.getReturnType());
                     }
-                    return response.getResponse();
+                    // 同步
+                    else {
+                        Future<ResponseMessage> future = context.createFuture(request);
+                        channel.writeAndFlush(request);
+                        ResponseMessage response = future.get(performance.getRequestTimeout(), TimeUnit.MILLISECONDS);
+                        //拦截器 后置 postHandle
+                        interceptors.stream().forEach(interceptor -> interceptor.postHandle(request, response));
+                        if (response.getExceptionType() != null) {
+                            throw new InvokeException(response.getExceptionMessage(), response.getExceptionType());
+                        }
+                        return response.getResponse();
+                    }
+
                 } catch (RuntimeException e) {
                     // 业务异常直接抛出
                     throw e;

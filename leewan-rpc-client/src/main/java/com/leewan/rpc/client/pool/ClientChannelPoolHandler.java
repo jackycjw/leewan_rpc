@@ -46,6 +46,5 @@ public class ClientChannelPoolHandler extends AbstractChannelPoolHandler {
         pipeline.addLast(new KryoMessageEncoder());
         pipeline.addLast(new KryoMessageDecoder());
         pipeline.addLast(new ResponseMessageHandler(container));
-        pipeline.addLast(new IdleHeartBeatHandler());
     }
 }

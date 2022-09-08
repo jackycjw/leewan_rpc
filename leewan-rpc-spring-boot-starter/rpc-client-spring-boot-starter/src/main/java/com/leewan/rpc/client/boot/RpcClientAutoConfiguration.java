@@ -23,6 +23,7 @@ public class RpcClientAutoConfiguration {
     public ClientContext clientContext(BootClientProperties clientProperties,
                                        ObjectProvider<List<Interceptor>> interceptorListProvider){
         DefaultClientContext clientContext = new DefaultClientContext(clientProperties);
+        clientContext.initialize();
         List<Interceptor> interceptorList = interceptorListProvider.getIfAvailable();
         if (!CollectionUtils.isEmpty(interceptorList)) {
             interceptorList.stream().forEach(clientContext::registerInterceptor);

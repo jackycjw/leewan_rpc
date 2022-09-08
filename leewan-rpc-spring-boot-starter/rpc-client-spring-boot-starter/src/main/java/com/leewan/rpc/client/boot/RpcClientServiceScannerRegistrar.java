@@ -4,6 +4,7 @@ import com.leewan.rpc.client.context.ClientContext;
 import com.leewan.rpc.client.context.InvokeMetaResolver;
 import com.leewan.rpc.client.context.RequestResponseContainer;
 import com.leewan.rpc.client.intercept.Interceptor;
+import com.leewan.rpc.share.internal.service.HeartBeatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.Aware;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -117,6 +118,9 @@ public class RpcClientServiceScannerRegistrar implements ImportBeanDefinitionReg
 
     private static boolean isExcluded(Class<?> clazz){
         if (Aware.class.isAssignableFrom(clazz)) {
+            return true;
+        }
+        if (HeartBeatService.class.equals(clazz)) {
             return true;
         }
         if (ClientContext.class.isAssignableFrom(clazz)

@@ -1,5 +1,9 @@
 package com.leewan.rpc.client.context.netty.handler;
 
+import com.leewan.rpc.client.context.call.CallBack;
+import com.leewan.rpc.client.context.call.ExecuteCall;
+import com.leewan.rpc.share.internal.dto.HearBeatDTO;
+import com.leewan.rpc.share.internal.service.HeartBeatService;
 import com.leewan.rpc.share.message.HeartBeat;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -15,14 +19,33 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IdleHeartBeatHandler extends ChannelInboundHandlerAdapter {
 
+    private HeartBeatService heartBeatService;
+
+    public IdleHeartBeatHandler(HeartBeatService heartBeatService) {
+        this.heartBeatService = heartBeatService;
+    }
+
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent stateEvent) {
             IdleState state = stateEvent.state();
             if (state == IdleState.WRITER_IDLE) {
+                log.info("send heart beat.");
                 //防止断链
-                ctx.channel().writeAndFlush(new HeartBeat());
-                log.debug("send heartbeat package");
+                ExecuteCall.executeAsyn(() -> {
+                    heartBeatService.send(new HearBeatDTO());
+                }, new CallBack<Object>() {
+                    @Override
+                    public void accept(Object o) {
+                        log.info("heart beat ok.");
+                    }
+
+                    @Override
+                    public void completeExceptionally(Throwable throwable) {
+                        log.error("heart beat timeout, close channel.");
+                        ctx.close();
+                    }
+                });
             }
         } else {
             super.userEventTriggered(ctx, evt);

@@ -3,6 +3,7 @@ package com.leewan.client;
 import com.leewan.rpc.client.configuration.ClientConfiguration;
 import com.leewan.rpc.client.context.ClientContext;
 import com.leewan.rpc.client.context.DefaultClientContext;
+import com.leewan.rpc.client.context.call.ExecuteCall;
 import com.leewan.rpc.server.RpcServer;
 import com.leewan.share.IService;
 
@@ -17,18 +18,20 @@ public class ClientApp {
         configuration.setMaxIdle(2);
         configuration.setMaxTotal(2);
         ClientContext clientContext = new DefaultClientContext(configuration);
+        clientContext.initialize();
         IService service = clientContext.getService(IService.class);
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
-        for (int i = 0; i < 100; i++) {
-            Random random = new Random();
-            threadPool.submit(()->{
-               service.s1();
-               service.s2(random.nextInt(100));
-                System.out.println(service.s3(random.nextInt(100), random.nextInt(100)));
-            });
+        for (int i = 0; i < 10; i++) {
+            int num = service.s3(i, 2 * i);
+            System.out.println(i + " : " + num);
         }
+
+        ExecuteCall.executeAsyn(()->{
+            service.s3(12, 13);
+        }, re -> {
+            System.out.println("异步: "+re);
+        });
 
     }
 }
