@@ -1,40 +1,36 @@
-package com.leewan.rpc.share.handler;
+package com.leewan.rpc.share.databind.kryo;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.leewan.rpc.share.databind.RequestDataBinder;
 import com.leewan.rpc.share.message.Message;
 import com.leewan.rpc.share.message.RequestMessage;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayOutputStream;
 
-import static com.leewan.rpc.share.message.Message.TYPE_REQUEST_MESSAGE;
-
-/**
- * @author chenjw
- * @Date 2022/1/11 13:11
- */
-public class KryoMessageEncoder extends MessageToByteEncoder<Message> {
+public class KryoRequestDataBinder implements RequestDataBinder {
     private Kryo kryo;
 
-    public KryoMessageEncoder(){
+    public KryoRequestDataBinder(){
         kryo = new Kryo();
         kryo.setReferences(false);
         kryo.setRegistrationRequired(false);
         kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
     }
-
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) throws Exception {
+    public byte[] serialize(RequestMessage request) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);
-        kryo.writeObject(output, msg);
+        kryo.writeObject(output, request);
         output.flush();
         output.close();
-        out.writeByte(msg.getType());
-        out.writeBytes(outputStream.toByteArray());
+        return outputStream.toByteArray();
+    }
+
+    @Override
+    public RequestMessage deserialize(byte[] bytes) {
+        return kryo.readObject(new Input(bytes), RequestMessage.class);
     }
 }

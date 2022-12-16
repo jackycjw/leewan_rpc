@@ -35,6 +35,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<RequestMessage> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage msg) throws Exception {
         ResponseMessage response = new ResponseMessage();
+        response.setInvokeMeta(msg.getInvokeMeta());
         try {
             this.filterChain.doFilter(msg, response);
         } finally {

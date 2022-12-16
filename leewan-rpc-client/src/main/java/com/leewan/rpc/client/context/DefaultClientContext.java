@@ -88,6 +88,7 @@ public class DefaultClientContext implements ClientContext {
 
 
     private final Map<Method, InvokeMeta> invokeMetaMap = new ConcurrentHashMap<>();
+    private final Map<InvokeMeta, Method> methodMap = new ConcurrentHashMap<>();
 
 
     public InvokeMeta getInvokeMeta(Method method) {
@@ -215,4 +216,5 @@ public class DefaultClientContext implements ClientContext {
             }
         }
     }
+
 }

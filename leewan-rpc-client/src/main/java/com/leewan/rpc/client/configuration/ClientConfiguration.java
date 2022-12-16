@@ -7,7 +7,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.time.Duration;
 
-@Data()
+@Data
 public class ClientConfiguration extends Configuration {
     private String remoteAddress = "localhost";
 

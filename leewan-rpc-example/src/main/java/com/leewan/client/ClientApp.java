@@ -23,15 +23,21 @@ public class ClientApp {
 
 
         for (int i = 0; i < 10; i++) {
-            int num = service.s3(i, 2 * i);
-            System.out.println(i + " : " + num);
+
+
         }
 
-        ExecuteCall.executeAsyn(()->{
-            service.s3(12, 13);
-        }, re -> {
-            System.out.println("异步: "+re);
-        });
+        int num = service.s3(0, 1);
+        System.out.println(num);
+        System.out.println("--------------");
+        num = service.s3(2, 4);
+        System.out.println(num);
+
+//        ExecuteCall.executeAsyn(()->{
+//            service.s3(12, 13);
+//        }, re -> {
+//            System.out.println("异步: "+re);
+//        });
 
     }
 }

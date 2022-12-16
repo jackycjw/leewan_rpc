@@ -1,9 +1,13 @@
 package com.leewan.rpc.share.util;
 
 
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.leewan.rpc.share.message.InvokeMeta;
 import lombok.SneakyThrows;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +18,7 @@ import java.util.List;
  */
 public class ReflectUtils {
 
-    public static List<Class<?>> findInterfaces(Class<?> clazz){
+    public static List<Class<?>> findInterfaces(Class<?> clazz) {
         List<Class<?>> result = new ArrayList<>();
         Class<?>[] interfaces = clazz.getInterfaces();
         Arrays.stream(interfaces)
@@ -33,13 +37,35 @@ public class ReflectUtils {
         return result;
     }
 
-    public static boolean isEffectiveInterface(Class<?> clazz){
+    @SneakyThrows
+    public static Method resolveMethod(InvokeMeta meta) {
+        String clazzName = meta.getClazzName();
+        Class<?> interClazz = Class.forName(clazzName);
+        List<String> parameterTypeNames = meta.getParameterTypeNames();
+        Class[] classes = new Class[parameterTypeNames.size()];
+        for (int i = 0; i < classes.length; i++) {
+            classes[i] = getClassByName(parameterTypeNames.get(i));
+        }
+        return interClazz.getDeclaredMethod(meta.getMethodName(), classes);
+    }
+
+    @SneakyThrows
+    public static TypeReference getTypeReference(Type type) {
+        TypeReference reference = new TypeReference<>() {
+        };
+        Field field = TypeReference.class.getDeclaredField("_type");
+        field.setAccessible(true);
+        field.set(reference, type);
+        return reference;
+    }
+
+    public static boolean isEffectiveInterface(Class<?> clazz) {
         return clazz.getMethods().length > 0;
     }
 
     @SneakyThrows
-    public static Class getClassByName(String name){
-        switch (name){
+    public static Class getClassByName(String name) {
+        switch (name) {
             case "int":
                 return int.class;
             case "short":

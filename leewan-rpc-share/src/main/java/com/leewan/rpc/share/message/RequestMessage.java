@@ -26,8 +26,4 @@ public class RequestMessage extends SequenceMessage {
      */
     private List<Object> parameters = new ArrayList<>(3);
 
-    @Override
-    public byte getType() {
-        return TYPE_REQUEST_MESSAGE;
-    }
 }

@@ -2,6 +2,7 @@ package com.leewan.rpc.share.message;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ import java.util.Objects;
  * 方法元数据
  */
 @Data
-public class InvokeMeta {
+public class InvokeMeta implements Serializable {
     /**
      * 方法标记 优先使用方法标记
      * 如果为-1 则使用下面的元数据

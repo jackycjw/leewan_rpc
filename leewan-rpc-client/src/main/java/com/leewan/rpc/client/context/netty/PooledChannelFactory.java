@@ -2,15 +2,13 @@ package com.leewan.rpc.client.context.netty;
 
 import com.leewan.rpc.client.configuration.ClientConfiguration;
 import com.leewan.rpc.client.context.ClientContext;
-import com.leewan.rpc.client.context.RequestResponseContainer;
 import com.leewan.rpc.client.context.netty.handler.IdleHeartBeatHandler;
+import com.leewan.rpc.client.context.netty.handler.LogHandler;
 import com.leewan.rpc.client.context.netty.handler.ResponseMessageHandler;
-import com.leewan.rpc.share.handler.KryoMessageDecoder;
-import com.leewan.rpc.share.handler.KryoMessageEncoder;
+import com.leewan.rpc.share.handler.ClientMessageCodec;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
 import com.leewan.rpc.share.internal.service.HeartBeatService;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -43,24 +41,14 @@ public class PooledChannelFactory implements PooledObjectFactory<Channel> {
                         log.info("new channel {} created", ch);
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new IdleStateHandler(0,configuration.getIdleHeartBeat(),0, TimeUnit.SECONDS));
-
-                        //
                         pipeline.addLast(new LengthFieldBasedFrameDecoder(
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
-                        pipeline.addLast(new ChannelInboundHandlerAdapter() {
-                            @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                                if (msg instanceof ByteBuf buf) {
-                                    log.debug("收到: {}", buf.readableBytes());
-                                }
-                                super.channelRead(ctx, msg);
-                            }
-                        });
+                        pipeline.addLast(new LogHandler());
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
                         pipeline.addLast(new JdkZlibEncoder());
 
-                        pipeline.addLast(new KryoMessageEncoder());
-                        pipeline.addLast(new KryoMessageDecoder());
+                        //请求的序列化  响应的反序列化
+                        pipeline.addLast(new ClientMessageCodec(configuration));
 
                         pipeline.addLast(new ResponseMessageHandler(context));
                         pipeline.addLast(new IdleHeartBeatHandler(heartBeatService));

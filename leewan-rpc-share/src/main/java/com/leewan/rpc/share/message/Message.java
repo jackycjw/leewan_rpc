@@ -11,5 +11,4 @@ public interface Message extends Serializable {
     byte TYPE_RESPONSE_MESSAGE = 1;
     byte TYPE_HEART_BEAT = 2;
 
-    byte getType();
 }
