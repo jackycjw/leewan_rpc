@@ -26,6 +26,10 @@ public class ClientApp {
 
 
         }
+        System.out.println("--------");
+        System.out.println(service.hh("]]]]"));
+        System.out.println(service);
+        System.out.println(service.hashCode());
 
         int num = service.s3(0, 1);
         System.out.println(num);

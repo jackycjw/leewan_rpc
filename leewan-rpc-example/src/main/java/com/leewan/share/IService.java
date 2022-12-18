@@ -7,6 +7,10 @@ public interface IService {
     void s1();
     void s2(int n);
 
+    default String hh(String s){
+        return "hh - " + s;
+    }
+
     @Call(requestTimeout = 100000000)
     int s3(int a, int b);
 

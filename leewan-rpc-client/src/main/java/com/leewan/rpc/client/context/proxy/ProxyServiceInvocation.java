@@ -13,8 +13,10 @@ import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -43,7 +45,13 @@ public class ProxyServiceInvocation implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Exception exception = null;
-        if (method.getDeclaringClass().equals(proxyedInterface) && !method.isDefault()) {
+        if (method.getDeclaringClass().equals(proxyedInterface)) {
+
+            //默认方法则执行默认方法
+            if (method.isDefault()) {
+                MethodHandle handle = getMethodHandleJava9(method);
+                return handle.bindTo(proxy).invokeWithArguments(args);
+            }
             CallPerformance performance = context.getCallPerformance(method);
             int retry = performance.getRetry();
             do {
@@ -51,36 +59,7 @@ public class ProxyServiceInvocation implements InvocationHandler {
                 Channel channel = null;
                 try {
                     channel = channelPool.borrowObject();
-                    //调用元数据
-                    InvokeMeta meta = context.getInvokeMeta(method);
-                    RequestMessage request = getRequestMessage(meta, args);
-
-                    //获取请求唯一键
-                    int sequence = context.getSequence();
-                    request.setSequence(sequence);
-
-                    //拦截器 前置 preHandle
-                    interceptors.stream().forEach(interceptor -> interceptor.preHandle(request));
-                    //异步
-                    if (ExecuteCall.isCurrentAsyn()) {
-                        context.saveCallback(request, ExecuteCall.getCurrentConsumer(), performance);
-                        //正式发送请求
-                        channel.writeAndFlush(request);
-                        return ObjectUtils.getDefaultBasicValue(method.getReturnType());
-                    }
-                    // 同步
-                    else {
-                        Future<ResponseMessage> future = context.createFuture(request);
-                        channel.writeAndFlush(request);
-                        ResponseMessage response = future.get(performance.getRequestTimeout(), TimeUnit.MILLISECONDS);
-                        //拦截器 后置 postHandle
-                        interceptors.stream().forEach(interceptor -> interceptor.postHandle(request, response));
-                        if (response.getExceptionType() != null) {
-                            throw new InvokeException(response.getExceptionMessage(), response.getExceptionType());
-                        }
-                        return response.getResponse();
-                    }
-
+                    return doInvoke(method, args, performance, channel);
                 } catch (RuntimeException e) {
                     // 业务异常直接抛出
                     throw e;
@@ -100,10 +79,70 @@ public class ProxyServiceInvocation implements InvocationHandler {
             } while (retry >= 0);
 
         } else {
-            return method.invoke(proxy, args);
+            return method.invoke(this, args);
         }
         throw exception;
     }
+
+    private MethodHandle getMethodHandleJava9(Method method) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Class<?> declaringClass = method.getDeclaringClass();
+        return ((MethodHandles.Lookup)privateLookupInMethod.invoke((Object)null, declaringClass, MethodHandles.lookup())).findSpecial(declaringClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()), declaringClass);
+    }
+
+    static Method privateLookupInMethod;
+    static {
+        Method privateLookupIn;
+        try {
+            privateLookupIn = MethodHandles.class.getMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
+        } catch (NoSuchMethodException var5) {
+            privateLookupIn = null;
+        }
+        privateLookupInMethod = privateLookupIn;
+    }
+
+
+
+    /**
+     * 执行代理方法
+     * @param method
+     * @param args
+     * @param performance
+     * @return
+     * @throws Exception
+     */
+    public Object doInvoke(Method method, Object[] args, CallPerformance performance, Channel channel) throws Exception{
+
+        //调用元数据
+        InvokeMeta meta = context.getInvokeMeta(method);
+        RequestMessage request = getRequestMessage(meta, args);
+
+        //获取请求唯一键
+        int sequence = context.getSequence();
+        request.setSequence(sequence);
+
+        //拦截器 前置 preHandle
+        interceptors.stream().forEach(interceptor -> interceptor.preHandle(request));
+        //异步
+        if (ExecuteCall.isCurrentAsyn()) {
+            context.saveCallback(request, ExecuteCall.getCurrentConsumer(), performance);
+            //正式发送请求
+            channel.writeAndFlush(request);
+            return ObjectUtils.getDefaultBasicValue(method.getReturnType());
+        }
+        // 同步
+        else {
+            Future<ResponseMessage> future = context.createFuture(request);
+            channel.writeAndFlush(request);
+            ResponseMessage response = future.get(performance.getRequestTimeout(), TimeUnit.MILLISECONDS);
+            //拦截器 后置 postHandle
+            interceptors.stream().forEach(interceptor -> interceptor.postHandle(request, response));
+            if (response.getExceptionType() != null) {
+                throw new InvokeException(response.getExceptionMessage(), response.getExceptionType());
+            }
+            return response.getResponse();
+        }
+    }
+
 
 
     private RequestMessage getRequestMessage(InvokeMeta meta, Object[] args) {
