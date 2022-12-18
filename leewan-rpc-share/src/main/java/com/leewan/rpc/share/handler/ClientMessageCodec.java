@@ -25,7 +25,7 @@ public class ClientMessageCodec extends ByteToMessageCodec {
     private ResponseDataBinder responseDataBinder;
 
     public ClientMessageCodec(Configuration configuration) {
-        log.info("创建序列化");
+        log.debug("创建序列化");
         String requestDataBinderClass = configuration.getRequestDataBinderClass();
         requestDataBinder = ObjectUtils.getSingleton(requestDataBinderClass,
                 ()-> "请求序列化/反序列化方式["+requestDataBinderClass + "]实例化失败：");
@@ -33,15 +33,15 @@ public class ClientMessageCodec extends ByteToMessageCodec {
         String responseDataBinderClass = configuration.getResponseDataBinderClass();
         responseDataBinder = ObjectUtils.getSingleton(responseDataBinderClass,
                 ()-> "请求序列化/反序列化方式["+requestDataBinderClass + "]实例化失败：");
-        log.info("创建序列化结束");
+        log.debug("创建序列化结束");
     }
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-        log.info("序列化。。。。。。");
+        log.debug("序列化。。。。。。");
         if (o instanceof RequestMessage request) {
             try {
                 byte[] bytes = requestDataBinder.serialize(request);
-                log.info("序列化：size {}, data:{}", bytes.length, new String(bytes));
+                log.debug("序列化：size {}, data:{}", bytes.length, new String(bytes));
                 byteBuf.writeBytes(bytes);
                 return;
             }catch (Throwable e){
