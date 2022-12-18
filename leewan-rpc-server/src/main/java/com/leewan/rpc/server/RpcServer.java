@@ -12,6 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.compression.JdkZlibDecoder;
+import io.netty.handler.codec.compression.JdkZlibEncoder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,6 +79,8 @@ public class RpcServer {
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
                         pipeline.addLast(new JdkZlibDecoder());
+                        pipeline.addLast(new JdkZlibEncoder(9));
+
 
                         //请求的反序列化  响应的序列化
                         pipeline.addLast(new ServerMessageCodec(configuration));
