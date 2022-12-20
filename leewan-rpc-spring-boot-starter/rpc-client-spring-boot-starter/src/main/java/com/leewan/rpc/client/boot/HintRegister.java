@@ -45,6 +45,8 @@ public class HintRegister implements RuntimeHintsRegistrar {
         registerType(hints, ArrayList.class);
         registerType(hints, HearBeatDTO.class);
         registerType(hints, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class);
+        registerType(hints, com.esotericsoftware.kryo.serializers.MapSerializer.class);
+        registerType(hints, com.esotericsoftware.kryo.serializers.CollectionSerializer.class);
 
 
     }
