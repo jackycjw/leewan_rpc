@@ -42,8 +42,8 @@ public class JacksonRequestDataBinder implements RequestDataBinder {
     public byte[] serialize(RequestMessage request) {
         try {
             byte[] bytes = mapper.writeValueAsBytes(request);
-            log.info("序列化：长度 {}", bytes.length);
-            log.info("序列化：结果 {}", new String(bytes));
+            log.debug("序列化：长度 {}", bytes.length);
+            log.debug("序列化：结果 {}", new String(bytes));
             return bytes;
         } catch (IOException e) {
             throw new DataBinderException(e.getMessage(), e);

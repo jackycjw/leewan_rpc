@@ -15,10 +15,12 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportRuntimeHints;
 
 import java.util.List;
 
 @AutoConfiguration
+@ImportRuntimeHints(HintRegister.class)
 @EnableConfigurationProperties(BootClientProperties.class)
 @ConditionalOnProperty(prefix = "leewan-rpc.client", name = "enable", havingValue = "true")
 @Slf4j
