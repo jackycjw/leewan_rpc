@@ -6,6 +6,7 @@ public interface IService {
 
     void s1();
     void s2(int n);
+    void say(String string);
 
     default String hh(String s){
         return "hh - " + s;

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.leewan.rpc.share.databind.DataBinderType;
 import com.leewan.rpc.share.databind.RequestDataBinder;
 import com.leewan.rpc.share.except.DataBinderException;
 import com.leewan.rpc.share.message.RequestMessage;
@@ -39,12 +40,14 @@ public class JacksonRequestDataBinder implements RequestDataBinder {
     }
 
     @Override
+    public byte getType() {
+        return DataBinderType.JACKSON;
+    }
+
+    @Override
     public byte[] serialize(RequestMessage request) {
         try {
-            byte[] bytes = mapper.writeValueAsBytes(request);
-            log.debug("序列化：长度 {}", bytes.length);
-            log.debug("序列化：结果 {}", new String(bytes));
-            return bytes;
+            return mapper.writeValueAsBytes(request);
         } catch (IOException e) {
             throw new DataBinderException(e.getMessage(), e);
         }

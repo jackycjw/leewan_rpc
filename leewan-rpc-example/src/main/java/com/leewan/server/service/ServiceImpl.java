@@ -16,6 +16,11 @@ public class ServiceImpl implements IService {
     }
 
     @Override
+    public void say(String string) {
+        System.out.println(string);
+    }
+
+    @Override
     public int s3(int a, int b) {
         log.info("s3 调用: {},{}", a,b);
         return a+b;

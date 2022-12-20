@@ -79,11 +79,11 @@ public class RpcServer {
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
                         pipeline.addLast(new JdkZlibDecoder());
-                        pipeline.addLast(new JdkZlibEncoder(9));
+                        pipeline.addLast(new JdkZlibEncoder(configuration.getCompressionLevel()));
 
 
                         //请求的反序列化  响应的序列化
-                        pipeline.addLast(new ServerMessageCodec(configuration));
+                        pipeline.addLast(new ServerMessageCodec(configuration.getResponseDataBinderClass()));
                         pipeline.addLast(serviceGroup, new ServiceHandler(serviceContainer, filters));
                     }
                 })

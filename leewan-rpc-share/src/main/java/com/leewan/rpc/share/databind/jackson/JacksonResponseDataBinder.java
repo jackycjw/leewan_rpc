@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.leewan.rpc.share.databind.DataBinderType;
 import com.leewan.rpc.share.databind.RequestDataBinder;
 import com.leewan.rpc.share.databind.ResponseDataBinder;
 import com.leewan.rpc.share.except.DataBinderException;
@@ -37,6 +38,10 @@ public class JacksonResponseDataBinder implements ResponseDataBinder {
     }
 
 
+    @Override
+    public byte getType() {
+        return DataBinderType.JACKSON;
+    }
 
     @Override
     public byte[] serialize(ResponseMessage response) {

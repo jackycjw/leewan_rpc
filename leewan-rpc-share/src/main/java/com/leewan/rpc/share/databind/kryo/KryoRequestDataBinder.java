@@ -3,6 +3,7 @@ package com.leewan.rpc.share.databind.kryo;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.leewan.rpc.share.databind.DataBinderType;
 import com.leewan.rpc.share.databind.RequestDataBinder;
 import com.leewan.rpc.share.message.Message;
 import com.leewan.rpc.share.message.RequestMessage;
@@ -18,6 +19,11 @@ public class KryoRequestDataBinder implements RequestDataBinder {
         kryo.setReferences(false);
         kryo.setRegistrationRequired(false);
         kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+    }
+
+    @Override
+    public byte getType() {
+        return DataBinderType.KRYO;
     }
     @Override
     public byte[] serialize(RequestMessage request) {

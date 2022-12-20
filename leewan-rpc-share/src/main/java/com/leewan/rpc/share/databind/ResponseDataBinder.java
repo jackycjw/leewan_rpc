@@ -8,6 +8,7 @@ import com.leewan.rpc.share.message.ResponseMessage;
  */
 public interface ResponseDataBinder {
 
+    byte getType();
 
     /**
      * 序列化

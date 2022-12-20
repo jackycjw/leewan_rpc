@@ -1,6 +1,7 @@
 package com.leewan.rpc.share.handler;
 
 import com.leewan.rpc.share.configuration.Configuration;
+import com.leewan.rpc.share.databind.DatabindService;
 import com.leewan.rpc.share.databind.RequestDataBinder;
 import com.leewan.rpc.share.databind.ResponseDataBinder;
 import com.leewan.rpc.share.except.DataBinderCreateException;
@@ -22,24 +23,19 @@ import java.util.List;
 public class ClientMessageCodec extends ByteToMessageCodec {
 
     private RequestDataBinder requestDataBinder;
-    private ResponseDataBinder responseDataBinder;
 
-    public ClientMessageCodec(Configuration configuration) {
+    public ClientMessageCodec(Class requestDataBinderClass) {
         log.debug("创建序列化");
-        String requestDataBinderClass = configuration.getRequestDataBinderClass();
-        requestDataBinder = ObjectUtils.getSingleton(requestDataBinderClass,
-                ()-> "请求序列化/反序列化方式["+requestDataBinderClass + "]实例化失败：");
-
-        String responseDataBinderClass = configuration.getResponseDataBinderClass();
-        responseDataBinder = ObjectUtils.getSingleton(responseDataBinderClass,
-                ()-> "请求序列化/反序列化方式["+requestDataBinderClass + "]实例化失败：");
-        log.debug("创建序列化结束");
+        requestDataBinder = DatabindService.getRequestDataBinder(requestDataBinderClass);
     }
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-        log.debug("序列化。。。。。。");
         if (o instanceof RequestMessage request) {
             try {
+                //写入序列化类型
+                byteBuf.writeByte(requestDataBinder.getType());
+
+                //实体序列化
                 byte[] bytes = requestDataBinder.serialize(request);
                 log.debug("序列化：size {}, data:{}", bytes.length, new String(bytes));
                 byteBuf.writeBytes(bytes);
@@ -48,16 +44,16 @@ public class ClientMessageCodec extends ByteToMessageCodec {
                 log.error(e.getMessage(), e);
                 throw e;
             }
-
         }
         throw new IllegalTypeException("request is not RequestMessage");
     }
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List list) throws Exception {
-        byte[] bytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(bytes);
-        ResponseMessage responseMessage = responseDataBinder.deserialize(bytes);
+        byte type = byteBuf.readByte();
+        byte[] content = new byte[byteBuf.readableBytes()];
+        byteBuf.readBytes(content);
+        ResponseMessage responseMessage = DatabindService.getResponseDataBinder(type).deserialize(content);
         list.add(responseMessage);
     }
 }

@@ -1,6 +1,8 @@
 package com.leewan.rpc.client.configuration;
 
 import com.leewan.rpc.share.configuration.Configuration;
+import com.leewan.rpc.share.databind.RequestDataBinder;
+import com.leewan.rpc.share.databind.kryo.KryoRequestDataBinder;
 import io.netty.channel.Channel;
 import lombok.Data;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -10,6 +12,11 @@ import java.time.Duration;
 @Data
 public class ClientConfiguration extends Configuration {
     private String remoteAddress = "localhost";
+
+    /**
+     * 请求序列化/反序列化方式
+     */
+    private Class<? extends RequestDataBinder> requestDataBinderClass = KryoRequestDataBinder.class;
 
     /**
      * 连接超时 毫秒

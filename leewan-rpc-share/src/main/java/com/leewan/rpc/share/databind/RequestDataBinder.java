@@ -15,13 +15,14 @@ import java.util.List;
  */
 public interface RequestDataBinder {
 
+    byte getType();
 
     /**
      * 序列化
      * @param request
      * @return
      */
-    public abstract byte[] serialize(RequestMessage request);
+    byte[] serialize(RequestMessage request);
 
 
     /**
@@ -29,6 +30,6 @@ public interface RequestDataBinder {
      * @param bytes
      * @return
      */
-    public abstract RequestMessage deserialize(byte[] bytes);
+    RequestMessage deserialize(byte[] bytes);
 
 }

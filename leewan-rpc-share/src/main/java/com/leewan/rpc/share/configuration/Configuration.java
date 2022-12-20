@@ -19,12 +19,8 @@ public class Configuration {
     private int port = 5540;
 
     /**
-     * 请求序列化/反序列化方式
+     * 压缩等级 0-9
      */
-    private String requestDataBinderClass = KryoRequestDataBinder.class.getName();
+    private int compressionLevel = 6;
 
-    /**
-     * 响应体序列化/反序列化方式
-     */
-    private String responseDataBinderClass = KryoResponseDataBinder.class.getName();
 }

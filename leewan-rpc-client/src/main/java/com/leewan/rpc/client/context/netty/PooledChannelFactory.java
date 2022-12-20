@@ -46,11 +46,11 @@ public class PooledChannelFactory implements PooledObjectFactory<Channel> {
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
                         pipeline.addLast(new LogHandler());
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
-                        pipeline.addLast(new JdkZlibEncoder(9));
+                        pipeline.addLast(new JdkZlibEncoder(configuration.getCompressionLevel()));
                         pipeline.addLast(new JdkZlibDecoder());
 
                         //请求的序列化  响应的反序列化
-                        pipeline.addLast(new ClientMessageCodec(configuration));
+                        pipeline.addLast(new ClientMessageCodec(configuration.getRequestDataBinderClass()));
 
                         pipeline.addLast(new ResponseMessageHandler(context));
                         pipeline.addLast(new IdleHeartBeatHandler(heartBeatService));
