@@ -1,5 +1,6 @@
 package com.leewan.rpc.client.boot;
 
+import com.esotericsoftware.kryo.serializers.DefaultArraySerializers;
 import com.leewan.rpc.client.context.netty.PooledChannelFactory;
 import com.leewan.rpc.client.context.netty.handler.IdleHeartBeatHandler;
 import com.leewan.rpc.client.context.netty.handler.LogHandler;
@@ -47,6 +48,17 @@ public class HintRegister implements RuntimeHintsRegistrar {
         registerType(hints, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class);
         registerType(hints, com.esotericsoftware.kryo.serializers.MapSerializer.class);
         registerType(hints, com.esotericsoftware.kryo.serializers.CollectionSerializer.class);
+        registerType(hints, com.esotericsoftware.kryo.serializers.DefaultArraySerializers.class);
+        registerType(hints, DefaultArraySerializers.BooleanArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.ByteArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.CharArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.DoubleArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.FloatArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.IntArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.LongArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.ObjectArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.ShortArraySerializer.class);
+        registerType(hints, DefaultArraySerializers.StringArraySerializer.class);
 
 
     }
