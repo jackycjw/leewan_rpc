@@ -29,7 +29,7 @@ public class KryoRequestDataBinder implements RequestDataBinder {
     public byte[] serialize(RequestMessage request) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);
-        kryo.writeObject(output, request);
+        kryo.writeClassAndObject(output, request);
         output.close();
         return outputStream.toByteArray();
     }
@@ -37,7 +37,7 @@ public class KryoRequestDataBinder implements RequestDataBinder {
     @Override
     public RequestMessage deserialize(byte[] bytes) {
         Input input = new Input(bytes);
-        RequestMessage message = kryo.readObject(input, RequestMessage.class);
+        RequestMessage message = (RequestMessage) kryo.readClassAndObject(input);
         input.close();
         return message;
     }

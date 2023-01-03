@@ -31,14 +31,16 @@ public class KryoResponseDataBinder implements ResponseDataBinder {
     public byte[] serialize(ResponseMessage response) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);
-        kryo.writeObject(output, response);
-        output.flush();
+        kryo.writeClassAndObject(output, response);
         output.close();
         return outputStream.toByteArray();
     }
 
     @Override
     public ResponseMessage deserialize(byte[] bytes) {
-        return kryo.readObject(new Input(bytes), ResponseMessage.class);
+        Input input = new Input(bytes);
+        ResponseMessage message = (ResponseMessage) kryo.readClassAndObject(input);
+        input.close();
+        return message;
     }
 }
