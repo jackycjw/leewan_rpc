@@ -11,15 +11,7 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayOutputStream;
 
-public class KryoRequestDataBinder implements RequestDataBinder {
-    private Kryo kryo;
-
-    public KryoRequestDataBinder(){
-        kryo = new Kryo();
-        kryo.setReferences(false);
-        kryo.setRegistrationRequired(false);
-        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
-    }
+public class KryoRequestDataBinder extends AbstractKryoDataBinder implements RequestDataBinder {
 
     @Override
     public byte getType() {
@@ -29,7 +21,7 @@ public class KryoRequestDataBinder implements RequestDataBinder {
     public byte[] serialize(RequestMessage request) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);
-        kryo.writeClassAndObject(output, request);
+        getKryo().writeClassAndObject(output, request);
         output.close();
         return outputStream.toByteArray();
     }
@@ -37,7 +29,7 @@ public class KryoRequestDataBinder implements RequestDataBinder {
     @Override
     public RequestMessage deserialize(byte[] bytes) {
         Input input = new Input(bytes);
-        RequestMessage message = (RequestMessage) kryo.readClassAndObject(input);
+        RequestMessage message = (RequestMessage) getKryo().readClassAndObject(input);
         input.close();
         return message;
     }
