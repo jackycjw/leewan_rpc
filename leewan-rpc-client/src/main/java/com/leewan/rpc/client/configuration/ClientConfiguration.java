@@ -41,6 +41,11 @@ public class ClientConfiguration extends Configuration {
      */
     private int threadNum = 0;
 
+    /**
+     * RSA公钥
+     */
+    private String publicRsaKey;
+
 
     private int maxTotal = GenericObjectPoolConfig.DEFAULT_MAX_TOTAL;
     private int maxIdle = GenericObjectPoolConfig.DEFAULT_MAX_IDLE;

@@ -14,6 +14,10 @@ public class ServerConfiguration extends Configuration {
     private String bindAddress = "0.0.0.0";
 
     /**
+     * RSA公钥
+     */
+    private String privateRsaKey;
+    /**
      * 响应体序列化/反序列化方式
      */
     private Class<? extends ResponseDataBinder> responseDataBinderClass = KryoResponseDataBinder.class;

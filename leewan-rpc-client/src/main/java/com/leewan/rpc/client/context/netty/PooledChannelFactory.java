@@ -5,6 +5,7 @@ import com.leewan.rpc.client.context.ClientContext;
 import com.leewan.rpc.client.context.netty.handler.IdleHeartBeatHandler;
 import com.leewan.rpc.client.context.netty.handler.LogHandler;
 import com.leewan.rpc.client.context.netty.handler.ResponseMessageHandler;
+import com.leewan.rpc.share.handler.ClientCipherHandler;
 import com.leewan.rpc.share.handler.ClientMessageCodec;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
 import com.leewan.rpc.share.internal.service.HeartBeatService;
@@ -38,14 +39,19 @@ public class PooledChannelFactory implements PooledObjectFactory<Channel> {
                 .group(executors)
                 .handler(new ChannelInitializer<>() {
                     @Override
-                    protected void initChannel(Channel ch) {
+                    protected void initChannel(Channel ch) throws Exception {
                         log.info("new channel {} created", ch);
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new IdleStateHandler(0,configuration.getIdleHeartBeat(),0, TimeUnit.SECONDS));
                         pipeline.addLast(new LengthFieldBasedFrameDecoder(
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
                         pipeline.addLast(new LogHandler());
+
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
+                        //加密
+                        if (configuration.isEnableRsa()) {
+                            pipeline.addLast(new ClientCipherHandler(configuration.getPublicRsaKey()));
+                        }
                         pipeline.addLast(new JdkZlibEncoder(configuration.getCompressionLevel()));
                         pipeline.addLast(new JdkZlibDecoder());
 

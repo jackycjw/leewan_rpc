@@ -5,6 +5,7 @@ import com.leewan.rpc.server.filter.Filter;
 import com.leewan.rpc.server.handler.ServiceHandler;
 import com.leewan.rpc.server.internal.HeartBeatServiceImpl;
 import com.leewan.rpc.share.handler.LengthBasedOutboundHandler;
+import com.leewan.rpc.share.handler.ServerCipherHandler;
 import com.leewan.rpc.share.handler.ServerMessageCodec;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -78,6 +79,12 @@ public class RpcServer {
                         pipeline.addLast(new LengthFieldBasedFrameDecoder(
                                 configuration.getMaxMessageSize(), 0, 4, 0,4));
                         pipeline.addLast(new LengthBasedOutboundHandler(configuration.getMaxMessageSize()));
+
+                        //加密
+                        if (configuration.isEnableRsa()) {
+                            pipeline.addLast(new ServerCipherHandler(configuration.getPrivateRsaKey()));
+                        }
+
                         pipeline.addLast(new JdkZlibDecoder());
                         pipeline.addLast(new JdkZlibEncoder(configuration.getCompressionLevel()));
 

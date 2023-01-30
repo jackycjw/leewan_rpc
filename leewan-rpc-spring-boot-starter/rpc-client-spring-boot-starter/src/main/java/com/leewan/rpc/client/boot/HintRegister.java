@@ -12,18 +12,22 @@ import com.leewan.rpc.share.message.InvokeMeta;
 import com.leewan.rpc.share.message.RequestMessage;
 import com.leewan.rpc.share.message.ResponseMessage;
 import com.leewan.rpc.share.message.SequenceMessage;
+import lombok.SneakyThrows;
 import org.springframework.aot.generate.GeneratedTypeReference;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.ReflectionHints;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.javapoet.ClassName;
+
+import javax.crypto.Cipher;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class HintRegister implements RuntimeHintsRegistrar {
+    @SneakyThrows
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         hints.proxies()
@@ -59,8 +63,7 @@ public class HintRegister implements RuntimeHintsRegistrar {
         registerType(hints, DefaultArraySerializers.ObjectArraySerializer.class);
         registerType(hints, DefaultArraySerializers.ShortArraySerializer.class);
         registerType(hints, DefaultArraySerializers.StringArraySerializer.class);
-
-
+        registerType(hints, Cipher.getInstance("RSA").getClass());
     }
 
     private void registerType(RuntimeHints hints, Class cls){

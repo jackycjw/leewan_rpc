@@ -23,4 +23,8 @@ public class Configuration {
      */
     private int compressionLevel = 6;
 
+    /**
+     * 是否开启RSA加密
+     */
+    private boolean enableRsa;
 }
